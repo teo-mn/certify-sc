@@ -108,8 +108,10 @@ contract CertificationRegistration is Initializable, OwnableUpgradeable {
     }
 
     // Кредит цэнэглэх
-    function chargeCredit(address addr, uint256 credit) public onlyOwner {
+    function chargeCredit(address addr, uint256 credit) payable public onlyOwner {
+        require(msg.value > 0, 'Value can not be zero');
         credits[addr] += credit;
+        payable(addr).transfer(msg.value);
     }
 
     function getCredit(address addr) view public returns (uint256) {
