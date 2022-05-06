@@ -41,6 +41,14 @@ contract CertificationRegistration is Initializable, OwnableUpgradeable {
         }
         // check credit
         require(credits[msg.sender] > 0, "Not enough credit");
+
+        //check _expireDate
+        if (_expireDate > 0) {
+            require(block.timestamp < _expireDate, "Expire date can't be past");
+
+            require(_expireDate < block.timestamp + 1000 * 365 * 24 * 60 * 60,
+                "Expire date timestamp should be in seconds");
+        }
         // create
         cert.id = ++id;
         cert.hash = _hash;
