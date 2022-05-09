@@ -24,6 +24,7 @@ contract IssuerRegistration is Initializable, OwnableUpgradeable {
         issuerIDs[_addr] = ++lastIssuerID;
         issuer.id = lastIssuerID;
         issuer.name = _name;
+        issuer.createdAt = block.timestamp;
         issuer.regnum = _regnum;
         issuer.description = _description;
         issuer.category = _category;
@@ -41,6 +42,7 @@ contract IssuerRegistration is Initializable, OwnableUpgradeable {
         issuer.name = _name;
         issuer.regnum = _regnum;
         issuer.description = _description;
+        issuer.updatedAt = block.timestamp;
         issuer.category = _category;
         issuer.addr = _addr;
         issuer.metaDataUrl = _metaDataUrl;

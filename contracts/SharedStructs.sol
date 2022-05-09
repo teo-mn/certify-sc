@@ -11,5 +11,7 @@ library SharedStructs {
         address addr;
         string metaDataUrl;
         bool isActive;
+        uint256 createdAt;
+        uint256 updatedAt;
     }
 }
