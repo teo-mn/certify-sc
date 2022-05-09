@@ -59,6 +59,11 @@
       "address": "0x9dca2a5a5412C32930d6CAf8DC1e6c7C2DCd3483",
       "txHash": "0x8b220fd6d51ae01100d2f437341918f82a98ea14d5ffbd92adfa680c3490a5a1",
       "kind": "transparent"
+    },
+    {
+      "address": "0x75d3551A6F33039C28b235879B1E6590c1A901c5",
+      "txHash": "0xabfa03ee2ff0fbf6410b9888e2da882f3f9e2a0b563dbc73b585c8b7e7159b49",
+      "kind": "transparent"
     }
   ],
   "impls": {
@@ -749,15 +754,15 @@
             "slot": "101",
             "type": "t_uint256",
             "contract": "IssuerRegistration",
-            "src": "contracts/Issuer_Reg.sol:20"
+            "src": "contracts/IssuerRegistration.sol:9"
           },
           {
             "label": "issuers",
             "offset": 0,
             "slot": "102",
-            "type": "t_mapping(t_address,t_struct(Issuer)505_storage)",
+            "type": "t_mapping(t_address,t_struct(Issuer)1292_storage)",
             "contract": "IssuerRegistration",
-            "src": "contracts/Issuer_Reg.sol:21"
+            "src": "contracts/IssuerRegistration.sol:10"
           },
           {
             "label": "issuerIDs",
@@ -765,7 +770,7 @@
             "slot": "103",
             "type": "t_mapping(t_address,t_uint256)",
             "contract": "IssuerRegistration",
-            "src": "contracts/Issuer_Reg.sol:22"
+            "src": "contracts/IssuerRegistration.sol:11"
           },
           {
             "label": "issuerAddresses",
@@ -773,7 +778,7 @@
             "slot": "104",
             "type": "t_array(t_address)dyn_storage",
             "contract": "IssuerRegistration",
-            "src": "contracts/Issuer_Reg.sol:24"
+            "src": "contracts/IssuerRegistration.sol:13"
           }
         ],
         "types": {
@@ -797,8 +802,8 @@
             "label": "bool",
             "numberOfBytes": "1"
           },
-          "t_mapping(t_address,t_struct(Issuer)505_storage)": {
-            "label": "mapping(address => struct IssuerRegistration.Issuer)",
+          "t_mapping(t_address,t_struct(Issuer)1292_storage)": {
+            "label": "mapping(address => struct SharedStructs.Issuer)",
             "numberOfBytes": "32"
           },
           "t_mapping(t_address,t_uint256)": {
@@ -809,8 +814,8 @@
             "label": "string",
             "numberOfBytes": "32"
           },
-          "t_struct(Issuer)505_storage": {
-            "label": "struct IssuerRegistration.Issuer",
+          "t_struct(Issuer)1292_storage": {
+            "label": "struct SharedStructs.Issuer",
             "members": [
               {
                 "label": "id",
@@ -1710,6 +1715,178 @@
               }
             ],
             "numberOfBytes": "352"
+          },
+          "t_uint256": {
+            "label": "uint256",
+            "numberOfBytes": "32"
+          }
+        }
+      }
+    },
+    "f979321b40ef1608f2daf88721c1450baffa6dabe4ee7608f1aeca2ee996d617": {
+      "address": "0xB2473D46C768E3b6563a9B0421181213DF179E73",
+      "txHash": "0x962eaaa7278907e35ab5140d02e8a731d28be8188e35e688b9a3055663714fba",
+      "layout": {
+        "storage": [
+          {
+            "label": "_initialized",
+            "offset": 0,
+            "slot": "0",
+            "type": "t_bool",
+            "contract": "Initializable",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:39"
+          },
+          {
+            "label": "_initializing",
+            "offset": 1,
+            "slot": "0",
+            "type": "t_bool",
+            "contract": "Initializable",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:44"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "1",
+            "type": "t_array(t_uint256)50_storage",
+            "contract": "ContextUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol:36"
+          },
+          {
+            "label": "_owner",
+            "offset": 0,
+            "slot": "51",
+            "type": "t_address",
+            "contract": "OwnableUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol:22"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "52",
+            "type": "t_array(t_uint256)49_storage",
+            "contract": "OwnableUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol:87"
+          },
+          {
+            "label": "lastIssuerID",
+            "offset": 0,
+            "slot": "101",
+            "type": "t_uint256",
+            "contract": "IssuerRegistration",
+            "src": "contracts/IssuerRegistration.sol:9"
+          },
+          {
+            "label": "issuers",
+            "offset": 0,
+            "slot": "102",
+            "type": "t_mapping(t_address,t_struct(Issuer)1298_storage)",
+            "contract": "IssuerRegistration",
+            "src": "contracts/IssuerRegistration.sol:10"
+          },
+          {
+            "label": "issuerIDs",
+            "offset": 0,
+            "slot": "103",
+            "type": "t_mapping(t_address,t_uint256)",
+            "contract": "IssuerRegistration",
+            "src": "contracts/IssuerRegistration.sol:11"
+          },
+          {
+            "label": "issuerAddresses",
+            "offset": 0,
+            "slot": "104",
+            "type": "t_array(t_address)dyn_storage",
+            "contract": "IssuerRegistration",
+            "src": "contracts/IssuerRegistration.sol:13"
+          }
+        ],
+        "types": {
+          "t_address": {
+            "label": "address",
+            "numberOfBytes": "20"
+          },
+          "t_array(t_address)dyn_storage": {
+            "label": "address[]",
+            "numberOfBytes": "32"
+          },
+          "t_array(t_uint256)49_storage": {
+            "label": "uint256[49]",
+            "numberOfBytes": "1568"
+          },
+          "t_array(t_uint256)50_storage": {
+            "label": "uint256[50]",
+            "numberOfBytes": "1600"
+          },
+          "t_bool": {
+            "label": "bool",
+            "numberOfBytes": "1"
+          },
+          "t_mapping(t_address,t_struct(Issuer)1298_storage)": {
+            "label": "mapping(address => struct SharedStructs.Issuer)",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_address,t_uint256)": {
+            "label": "mapping(address => uint256)",
+            "numberOfBytes": "32"
+          },
+          "t_string_storage": {
+            "label": "string",
+            "numberOfBytes": "32"
+          },
+          "t_struct(Issuer)1298_storage": {
+            "label": "struct SharedStructs.Issuer",
+            "members": [
+              {
+                "label": "id",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "0"
+              },
+              {
+                "label": "name",
+                "type": "t_string_storage",
+                "offset": 0,
+                "slot": "1"
+              },
+              {
+                "label": "regnum",
+                "type": "t_string_storage",
+                "offset": 0,
+                "slot": "2"
+              },
+              {
+                "label": "description",
+                "type": "t_string_storage",
+                "offset": 0,
+                "slot": "3"
+              },
+              {
+                "label": "category",
+                "type": "t_string_storage",
+                "offset": 0,
+                "slot": "4"
+              },
+              {
+                "label": "addr",
+                "type": "t_address",
+                "offset": 0,
+                "slot": "5"
+              },
+              {
+                "label": "metaDataUrl",
+                "type": "t_string_storage",
+                "offset": 0,
+                "slot": "6"
+              },
+              {
+                "label": "isActive",
+                "type": "t_bool",
+                "offset": 0,
+                "slot": "7"
+              }
+            ],
+            "numberOfBytes": "256"
           },
           "t_uint256": {
             "label": "uint256",

@@ -22,6 +22,7 @@ contract IssuerRegistration is Initializable, OwnableUpgradeable {
         require(issuerIDs[_addr] == 0, "Issuer already exists");
         SharedStructs.Issuer memory issuer = issuers[_addr];
         issuerIDs[_addr] = ++lastIssuerID;
+        issuer.id = lastIssuerID;
         issuer.name = _name;
         issuer.regnum = _regnum;
         issuer.description = _description;
