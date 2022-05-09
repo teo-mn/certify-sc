@@ -3,7 +3,7 @@ const { ethers, upgrades } = require('hardhat');
 
 async function main () {
   const Class = await ethers.getContractFactory('IssuerRegistration');
-  await upgrades.upgradeProxy('0xB1aA1eBe8EA8B2Aa490436362C2D6ceEf1aA8263', Class);
+  await upgrades.upgradeProxy('0x9dca2a5a5412C32930d6CAf8DC1e6c7C2DCd3483', Class);
 }
 
 // We recommend this pattern to be able to use async/await everywhere

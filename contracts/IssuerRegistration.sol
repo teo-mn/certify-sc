@@ -3,22 +3,11 @@ pragma solidity ^0.8.1;
 
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
+import "./SharedStructs.sol";
 
 contract IssuerRegistration is Initializable, OwnableUpgradeable {
-
-    struct Issuer {
-        uint256 id;
-        string name;
-        string regnum;
-        string description;
-        string category;
-        address addr;
-        string metaDataUrl;
-        bool isActive;
-    }
-
     uint256 public lastIssuerID;
-    mapping(address => Issuer) public issuers;
+    mapping(address => SharedStructs.Issuer) public issuers;
     mapping(address => uint256) public issuerIDs;
 
     address[] public issuerAddresses;
@@ -31,7 +20,7 @@ contract IssuerRegistration is Initializable, OwnableUpgradeable {
     function addIssuer(address _addr, string memory _name, string memory _regnum, string memory _description,
         string memory _category, string memory _metaDataUrl) public onlyOwner {
         require(issuerIDs[_addr] == 0, "Issuer already exists");
-        Issuer memory issuer = issuers[_addr];
+        SharedStructs.Issuer memory issuer = issuers[_addr];
         issuerIDs[_addr] = ++lastIssuerID;
         issuer.name = _name;
         issuer.regnum = _regnum;
@@ -47,7 +36,7 @@ contract IssuerRegistration is Initializable, OwnableUpgradeable {
     function updateIssuer(address _addr, string memory _name, string memory _regnum, string memory _description,
         string memory _category, string memory _metaDataUrl, bool isActive) public onlyOwner {
         require(issuerIDs[_addr] > 0, "Issuer not found");
-        Issuer memory issuer = issuers[_addr];
+        SharedStructs.Issuer memory issuer = issuers[_addr];
         issuer.name = _name;
         issuer.regnum = _regnum;
         issuer.description = _description;
@@ -60,7 +49,7 @@ contract IssuerRegistration is Initializable, OwnableUpgradeable {
 
     function deactivateIssuer(address _addr) public onlyOwner {
         require(issuerIDs[_addr] > 0, "Issuer not found");
-        Issuer memory issuer = issuers[_addr];
+        SharedStructs.Issuer memory issuer = issuers[_addr];
         issuer.isActive = false;
         issuers[_addr] = issuer;
     }
@@ -69,7 +58,7 @@ contract IssuerRegistration is Initializable, OwnableUpgradeable {
         return issuerAddresses;
     }
 
-    function getIssuer(address _addr) view public returns (Issuer memory) {
+    function getIssuer(address _addr) view public returns (SharedStructs.Issuer memory) {
         return issuers[_addr];
     }
 

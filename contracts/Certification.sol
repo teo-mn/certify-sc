@@ -4,6 +4,9 @@ pragma solidity ^0.8.1;
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 
+import "./IssuerRegistration.sol";
+import "./SharedStructs.sol";
+
 contract CertificationRegistration is Initializable, OwnableUpgradeable {
     struct Certification {
         uint256 id;
@@ -26,29 +29,29 @@ contract CertificationRegistration is Initializable, OwnableUpgradeable {
     mapping (string => Certification) public mapByCertNum;
 
     mapping (address => uint256) public credits;
+    address public issuerRegistrationAddress;
 
     function initialize() public initializer {
         id = 0;
         __Ownable_init();
     }
 
+    function setIssuerRegistrationAddress(address _issuerRegistrationAddress) public onlyOwner {
+        require(_issuerRegistrationAddress != address(0), "Invalid address");
+        issuerRegistrationAddress = _issuerRegistrationAddress;
+    }
+
     // Certificate, диплом шинээр бүртгэх
     function addCertification(string memory _hash, string memory _certNum, uint256 _expireDate, string memory _version, string memory _desc) public returns (uint256) {
         // check exists
         Certification memory cert = certifications[_hash];
-        if (!cert.isRevoked) {
-            require(cert.id == 0, "Certificate already registered");
-        }
+        require(cert.isRevoked || cert.id == 0, "Certificate already registered");
         // check credit
         require(credits[msg.sender] > 0, "Not enough credit");
-
         //check _expireDate
-        if (_expireDate > 0) {
-            require(block.timestamp < _expireDate, "Expire date can't be past");
-
-            require(_expireDate < block.timestamp + 1000 * 365 * 24 * 60 * 60,
-                "Expire date timestamp should be in seconds");
-        }
+        require(_expireDate == 0 || block.timestamp < _expireDate, "Expire date can't be past");
+        require(_expireDate == 0 || _expireDate < block.timestamp + 1000 * 365 * 24 * 60 * 60,
+            "Expire date timestamp should be in seconds");
         // create
         cert.id = ++id;
         cert.hash = _hash;
@@ -126,4 +129,8 @@ contract CertificationRegistration is Initializable, OwnableUpgradeable {
         return credits[addr];
     }
 
+    function getIssuer(address issuer) view public returns (SharedStructs.Issuer memory) {
+        IssuerRegistration ir = IssuerRegistration(issuerRegistrationAddress);
+        return ir.getIssuer(issuer);
+    }
 }
