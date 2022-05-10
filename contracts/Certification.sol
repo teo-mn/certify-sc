@@ -20,6 +20,7 @@ contract CertificationRegistration is Initializable, OwnableUpgradeable {
         string description;
         string revokerName;
         uint256 revokedAt;
+        string txid;
     }
 
     uint256 public id;
@@ -132,5 +133,15 @@ contract CertificationRegistration is Initializable, OwnableUpgradeable {
     function getIssuer(address issuer) view public returns (SharedStructs.Issuer memory) {
         IssuerRegistration ir = IssuerRegistration(issuerRegistrationAddress);
         return ir.getIssuer(issuer);
+    }
+
+    function addTransactionId(string memory _hash, string memory _txid) public {
+        Certification memory cert = certifications[_hash];
+        require(cert.id > 0 && !cert.isRevoked, "Not found");
+        require(cert.issuer == msg.sender, "Permission denied");
+        cert.txid = _txid;
+        certifications[_hash] = cert;
+        mapById[cert.id] = cert;
+        mapByCertNum[cert.certNum] = cert;
     }
 }
