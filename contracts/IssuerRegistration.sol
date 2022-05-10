@@ -47,6 +47,7 @@ contract IssuerRegistration is Initializable, OwnableUpgradeable {
         issuer.addr = _addr;
         issuer.metaDataUrl = _metaDataUrl;
         issuer.isActive = isActive;
+        issuer.updatedAt = block.timestamp;
         issuers[_addr] = issuer;
     }
 
