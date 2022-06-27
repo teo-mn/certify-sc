@@ -12,16 +12,39 @@ contract UniversityDiploma is Initializable, OwnableUpgradeable {
         uint256 id;
         string certNum; // Дипломын дугаар
         string hash; // файлын хаш
+        string imageHash; // metadata ороогүй үеийн файлын хаш
+        string metaHash; // metadata хаш
         address issuer;
         uint256 expireDate;
         uint256 createdAt;
-        bool isRevoked;
         string description;
-        string revokerName;
-        uint256 revokedAt;
         string txid;
-        bool isApproved;
+        RevokeInfo revokeInfo;
+        ApproveInfo approveInfo;
     }
+
+    struct RevokeInfo {
+        string hash;
+        bool isRevoked;
+        address revokerAddress;
+        string revokerName;
+        string description;
+        uint256 revokedAt;
+    }
+
+    struct ApproveInfo {
+        string hash;
+        bool isApproved;
+        address approverAddress;
+        uint256 approvedAt;
+    }
+
+    event Issued(address issuer, string hash, string imageHash, string certNum, uint256 timestamp);
+    event Revoked(address revoker, string hash, string certNum, uint256 timestamp);
+    event Approved(address approver, string hash, string certNum, uint256 timestamp);
+    event IssuerRegistrationAddressChanged(address oldAddr, address newAddr, uint256 timestamp);
+    event ApproverAddressChanged(address oldAddr, address newAddr, uint256 timestamp);
+    event CreditCharged(address to, uint256 value, uint256 timestamp);
 
     uint256 public id;
     address public creditAddress;
@@ -40,19 +63,26 @@ contract UniversityDiploma is Initializable, OwnableUpgradeable {
 
     function setIssuerRegistrationAddress(address _issuerRegistrationAddress) public onlyOwner {
         require(_issuerRegistrationAddress != address(0), "Invalid address");
+        address oldAddr = issuerRegistrationAddress;
         issuerRegistrationAddress = _issuerRegistrationAddress;
+
+        emit IssuerRegistrationAddressChanged(oldAddr, _issuerRegistrationAddress, block.timestamp);
     }
 
     function setApproverAddress(address _approverAddress) public onlyOwner {
         require(_approverAddress != address(0), "Invalid address");
+        address old = approver;
         approver = _approverAddress;
+
+        emit ApproverAddressChanged(old, _approverAddress, block.timestamp);
     }
 
     // Certificate, диплом шинээр бүртгэх
-    function addCertification(string memory _hash, string memory _certNum, uint256 _expireDate, string memory _desc) public returns (uint256) {
+    function addCertification(string memory _hash, string memory _imageHash, string memory _metaHash,
+        string memory _certNum, uint256 _expireDate, string memory _desc) public returns (uint256) {
         // check exists
         Certification memory cert = certifications[_hash];
-        require(cert.isRevoked || cert.id == 0, "Certificate already registered");
+        require(cert.revokeInfo.isRevoked || cert.id == 0, "Certificate already registered");
         // check credit
         require(credits[msg.sender] > 0, "Not enough credit");
         //check _expireDate
@@ -60,27 +90,41 @@ contract UniversityDiploma is Initializable, OwnableUpgradeable {
         require(_expireDate == 0 || _expireDate < block.timestamp + 1000 * 365 * 24 * 60 * 60,
             "Expire date timestamp should be in seconds");
         // create
-        cert = Certification({id : ++id, hash : _hash, certNum: _certNum, issuer : msg.sender, expireDate : _expireDate,
-            createdAt : block.timestamp, isRevoked : false, description : _desc, revokerName : '',
-            revokedAt : 0, isApproved : false, txid: ''});
+        cert.id = ++id;
+        cert.hash = _hash;
+        cert.metaHash = _metaHash;
+        cert.imageHash = _imageHash;
+        cert.certNum = _certNum;
+        cert.issuer = msg.sender;
+        cert.expireDate = _expireDate;
+        cert.createdAt = block.timestamp;
+        cert.description = _desc;
 
         certifications[_hash] = cert;
         mapByCertNum[_certNum] = cert;
         // use credit
         credits[msg.sender] --;
+
+        emit Issued(msg.sender, _hash, _imageHash, _certNum, block.timestamp);
         return cert.id;
     }
 
     function approve(string memory _hash) public {
         require(msg.sender == approver, "Permission Denied");
         Certification memory cert = certifications[_hash];
-        cert.isApproved = true;
-//        cert.approvedAt = block.timestamp;
+        require(cert.approveInfo.isApproved == false, "Already approved");
+        require(cert.revokeInfo.isRevoked == false, "Revoked certification");
+        cert.approveInfo.isApproved = true;
+        cert.approveInfo.hash = _hash;
+        cert.approveInfo.approvedAt = block.timestamp;
+        cert.approveInfo.approverAddress = msg.sender;
 
         certifications[_hash] = cert;
         mapByCertNum[cert.certNum] = cert;
         // use credit
         credits[msg.sender] --;
+
+        emit Approved(msg.sender, _hash, cert.certNum, block.timestamp);
     }
 
     // сертификатын мэдээллийг файлын хашиар хайж олох
@@ -104,18 +148,21 @@ contract UniversityDiploma is Initializable, OwnableUpgradeable {
         require(cert.id > 0, "Certification not found");
         // check issuer
         require(msg.sender == cert.issuer || msg.sender == approver, "Permission denied");
-        require(cert.isRevoked == false, "Certification already revoked");
+        require(cert.revokeInfo.isRevoked == false, "Certification already revoked");
         // check credit
         require(credits[msg.sender] > 0, "Not enough credit");
         // revoke
-        cert.isRevoked = true;
-        cert.isApproved = false;
-        cert.revokerName = revokerName;
-        cert.revokedAt = block.timestamp;
+        cert.revokeInfo.isRevoked = true;
+        cert.approveInfo.isApproved = false;
+        cert.revokeInfo.revokerName = revokerName;
+        cert.revokeInfo.revokedAt = block.timestamp;
+        cert.revokeInfo.revokerAddress = msg.sender;
         certifications[cert.hash] = cert;
         mapByCertNum[cert.certNum] = cert;
         // use credit
         credits[msg.sender] --;
+
+        emit Revoked(msg.sender, cert.hash, cert.certNum, block.timestamp);
     }
 
     // Кредит цэнэглэх
@@ -123,6 +170,8 @@ contract UniversityDiploma is Initializable, OwnableUpgradeable {
         require(msg.value > 0, 'Value can not be zero');
         credits[addr] += credit;
         payable(addr).transfer(msg.value);
+
+        emit CreditCharged(addr, credit, block.timestamp);
     }
 
     function getCredit(address addr) view public returns (uint256) {
@@ -136,7 +185,7 @@ contract UniversityDiploma is Initializable, OwnableUpgradeable {
 
     function addTransactionId(string memory _hash, string memory _txid) public {
         Certification memory cert = certifications[_hash];
-        require(cert.id > 0 && !cert.isRevoked, "Not found");
+        require(cert.id > 0 && !cert.revokeInfo.isRevoked, "Not found");
         require(cert.issuer == msg.sender, "Permission denied");
         cert.txid = _txid;
         certifications[_hash] = cert;

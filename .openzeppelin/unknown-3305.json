@@ -64,6 +64,11 @@
       "address": "0x75d3551A6F33039C28b235879B1E6590c1A901c5",
       "txHash": "0xabfa03ee2ff0fbf6410b9888e2da882f3f9e2a0b563dbc73b585c8b7e7159b49",
       "kind": "transparent"
+    },
+    {
+      "address": "0xd86718488ec33b444d0269ABD7A7462320A8213b",
+      "txHash": "0xe3a4a7700a69665efde0e97daec26a26066a4a0355bdbc516d4a161994f7e7ef",
+      "kind": "transparent"
     }
   ],
   "impls": {
@@ -2479,6 +2484,590 @@
               }
             ],
             "numberOfBytes": "384"
+          },
+          "t_uint256": {
+            "label": "uint256",
+            "numberOfBytes": "32"
+          }
+        }
+      }
+    },
+    "cfed7ac4a9cd09538eb101b306987506f3eccf3373cdebe8f84f0e0a57a36bb5": {
+      "address": "0x8086D8F105c3B364A9497AD5A7fFDE7eA20cD1ec",
+      "txHash": "0x7f50cf9fb5b3fb5b25db08160ef61b36d267b5bcd7c690412dc6197d713c1a9d",
+      "layout": {
+        "storage": [
+          {
+            "label": "_initialized",
+            "offset": 0,
+            "slot": "0",
+            "type": "t_bool",
+            "contract": "Initializable",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:39"
+          },
+          {
+            "label": "_initializing",
+            "offset": 1,
+            "slot": "0",
+            "type": "t_bool",
+            "contract": "Initializable",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:44"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "1",
+            "type": "t_array(t_uint256)50_storage",
+            "contract": "ContextUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol:36"
+          },
+          {
+            "label": "_owner",
+            "offset": 0,
+            "slot": "51",
+            "type": "t_address",
+            "contract": "OwnableUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol:22"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "52",
+            "type": "t_array(t_uint256)49_storage",
+            "contract": "OwnableUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol:87"
+          },
+          {
+            "label": "id",
+            "offset": 0,
+            "slot": "101",
+            "type": "t_uint256",
+            "contract": "UniversityDiploma",
+            "src": "contracts/UniversityDiploma.sol:50"
+          },
+          {
+            "label": "creditAddress",
+            "offset": 0,
+            "slot": "102",
+            "type": "t_address",
+            "contract": "UniversityDiploma",
+            "src": "contracts/UniversityDiploma.sol:51"
+          },
+          {
+            "label": "approver",
+            "offset": 0,
+            "slot": "103",
+            "type": "t_address",
+            "contract": "UniversityDiploma",
+            "src": "contracts/UniversityDiploma.sol:53"
+          },
+          {
+            "label": "certifications",
+            "offset": 0,
+            "slot": "104",
+            "type": "t_mapping(t_string_memory_ptr,t_struct(Certification)1425_storage)",
+            "contract": "UniversityDiploma",
+            "src": "contracts/UniversityDiploma.sol:53"
+          },
+          {
+            "label": "mapByCertNum",
+            "offset": 0,
+            "slot": "105",
+            "type": "t_mapping(t_string_memory_ptr,t_struct(Certification)1425_storage)",
+            "contract": "UniversityDiploma",
+            "src": "contracts/UniversityDiploma.sol:54"
+          },
+          {
+            "label": "credits",
+            "offset": 0,
+            "slot": "106",
+            "type": "t_mapping(t_address,t_uint256)",
+            "contract": "UniversityDiploma",
+            "src": "contracts/UniversityDiploma.sol:57"
+          },
+          {
+            "label": "issuerRegistrationAddress",
+            "offset": 0,
+            "slot": "107",
+            "type": "t_address",
+            "contract": "UniversityDiploma",
+            "src": "contracts/UniversityDiploma.sol:59"
+          }
+        ],
+        "types": {
+          "t_address": {
+            "label": "address",
+            "numberOfBytes": "20"
+          },
+          "t_array(t_uint256)49_storage": {
+            "label": "uint256[49]",
+            "numberOfBytes": "1568"
+          },
+          "t_array(t_uint256)50_storage": {
+            "label": "uint256[50]",
+            "numberOfBytes": "1600"
+          },
+          "t_bool": {
+            "label": "bool",
+            "numberOfBytes": "1"
+          },
+          "t_mapping(t_address,t_uint256)": {
+            "label": "mapping(address => uint256)",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_string_memory_ptr,t_struct(Certification)1425_storage)": {
+            "label": "mapping(string => struct UniversityDiploma.Certification)",
+            "numberOfBytes": "32"
+          },
+          "t_string_memory_ptr": {
+            "label": "string",
+            "numberOfBytes": "32"
+          },
+          "t_string_storage": {
+            "label": "string",
+            "numberOfBytes": "32"
+          },
+          "t_struct(ApproveInfo)1447_storage": {
+            "label": "struct UniversityDiploma.ApproveInfo",
+            "members": [
+              {
+                "label": "hash",
+                "type": "t_string_storage",
+                "offset": 0,
+                "slot": "0"
+              },
+              {
+                "label": "isApproved",
+                "type": "t_bool",
+                "offset": 0,
+                "slot": "1"
+              },
+              {
+                "label": "approverAddress",
+                "type": "t_address",
+                "offset": 1,
+                "slot": "1"
+              },
+              {
+                "label": "approvedAt",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "2"
+              }
+            ],
+            "numberOfBytes": "96"
+          },
+          "t_struct(Certification)1425_storage": {
+            "label": "struct UniversityDiploma.Certification",
+            "members": [
+              {
+                "label": "id",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "0"
+              },
+              {
+                "label": "certNum",
+                "type": "t_string_storage",
+                "offset": 0,
+                "slot": "1"
+              },
+              {
+                "label": "hash",
+                "type": "t_string_storage",
+                "offset": 0,
+                "slot": "2"
+              },
+              {
+                "label": "imageHash",
+                "type": "t_string_storage",
+                "offset": 0,
+                "slot": "3"
+              },
+              {
+                "label": "metaHash",
+                "type": "t_string_storage",
+                "offset": 0,
+                "slot": "4"
+              },
+              {
+                "label": "issuer",
+                "type": "t_address",
+                "offset": 0,
+                "slot": "5"
+              },
+              {
+                "label": "expireDate",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "6"
+              },
+              {
+                "label": "createdAt",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "7"
+              },
+              {
+                "label": "description",
+                "type": "t_string_storage",
+                "offset": 0,
+                "slot": "8"
+              },
+              {
+                "label": "txid",
+                "type": "t_string_storage",
+                "offset": 0,
+                "slot": "9"
+              },
+              {
+                "label": "revokeInfo",
+                "type": "t_struct(RevokeInfo)1438_storage",
+                "offset": 0,
+                "slot": "10"
+              },
+              {
+                "label": "approveInfo",
+                "type": "t_struct(ApproveInfo)1447_storage",
+                "offset": 0,
+                "slot": "15"
+              }
+            ],
+            "numberOfBytes": "576"
+          },
+          "t_struct(RevokeInfo)1438_storage": {
+            "label": "struct UniversityDiploma.RevokeInfo",
+            "members": [
+              {
+                "label": "hash",
+                "type": "t_string_storage",
+                "offset": 0,
+                "slot": "0"
+              },
+              {
+                "label": "isRevoked",
+                "type": "t_bool",
+                "offset": 0,
+                "slot": "1"
+              },
+              {
+                "label": "revokerAddress",
+                "type": "t_address",
+                "offset": 1,
+                "slot": "1"
+              },
+              {
+                "label": "revokerName",
+                "type": "t_string_storage",
+                "offset": 0,
+                "slot": "2"
+              },
+              {
+                "label": "description",
+                "type": "t_string_storage",
+                "offset": 0,
+                "slot": "3"
+              },
+              {
+                "label": "revokedAt",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "4"
+              }
+            ],
+            "numberOfBytes": "160"
+          },
+          "t_uint256": {
+            "label": "uint256",
+            "numberOfBytes": "32"
+          }
+        }
+      }
+    },
+    "8eccb3c32527251be9247346cdf27972962f66f66bf511715ed450e885b5399d": {
+      "address": "0x8aCB9Ad5a01351719e4CdD6FE52a93fe2Bce9D9a",
+      "txHash": "0x0211193f640941b47c952b2146270bd27c19dd01eea58178d7fe45c770a8d0f6",
+      "layout": {
+        "storage": [
+          {
+            "label": "_initialized",
+            "offset": 0,
+            "slot": "0",
+            "type": "t_bool",
+            "contract": "Initializable",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:39"
+          },
+          {
+            "label": "_initializing",
+            "offset": 1,
+            "slot": "0",
+            "type": "t_bool",
+            "contract": "Initializable",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:44"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "1",
+            "type": "t_array(t_uint256)50_storage",
+            "contract": "ContextUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol:36"
+          },
+          {
+            "label": "_owner",
+            "offset": 0,
+            "slot": "51",
+            "type": "t_address",
+            "contract": "OwnableUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol:22"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "52",
+            "type": "t_array(t_uint256)49_storage",
+            "contract": "OwnableUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol:87"
+          },
+          {
+            "label": "id",
+            "offset": 0,
+            "slot": "101",
+            "type": "t_uint256",
+            "contract": "UniversityDiploma",
+            "src": "contracts/UniversityDiploma.sol:50"
+          },
+          {
+            "label": "creditAddress",
+            "offset": 0,
+            "slot": "102",
+            "type": "t_address",
+            "contract": "UniversityDiploma",
+            "src": "contracts/UniversityDiploma.sol:51"
+          },
+          {
+            "label": "approver",
+            "offset": 0,
+            "slot": "103",
+            "type": "t_address",
+            "contract": "UniversityDiploma",
+            "src": "contracts/UniversityDiploma.sol:53"
+          },
+          {
+            "label": "certifications",
+            "offset": 0,
+            "slot": "104",
+            "type": "t_mapping(t_string_memory_ptr,t_struct(Certification)1425_storage)",
+            "contract": "UniversityDiploma",
+            "src": "contracts/UniversityDiploma.sol:53"
+          },
+          {
+            "label": "mapByCertNum",
+            "offset": 0,
+            "slot": "105",
+            "type": "t_mapping(t_string_memory_ptr,t_struct(Certification)1425_storage)",
+            "contract": "UniversityDiploma",
+            "src": "contracts/UniversityDiploma.sol:54"
+          },
+          {
+            "label": "credits",
+            "offset": 0,
+            "slot": "106",
+            "type": "t_mapping(t_address,t_uint256)",
+            "contract": "UniversityDiploma",
+            "src": "contracts/UniversityDiploma.sol:57"
+          },
+          {
+            "label": "issuerRegistrationAddress",
+            "offset": 0,
+            "slot": "107",
+            "type": "t_address",
+            "contract": "UniversityDiploma",
+            "src": "contracts/UniversityDiploma.sol:59"
+          }
+        ],
+        "types": {
+          "t_address": {
+            "label": "address",
+            "numberOfBytes": "20"
+          },
+          "t_array(t_uint256)49_storage": {
+            "label": "uint256[49]",
+            "numberOfBytes": "1568"
+          },
+          "t_array(t_uint256)50_storage": {
+            "label": "uint256[50]",
+            "numberOfBytes": "1600"
+          },
+          "t_bool": {
+            "label": "bool",
+            "numberOfBytes": "1"
+          },
+          "t_mapping(t_address,t_uint256)": {
+            "label": "mapping(address => uint256)",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_string_memory_ptr,t_struct(Certification)1425_storage)": {
+            "label": "mapping(string => struct UniversityDiploma.Certification)",
+            "numberOfBytes": "32"
+          },
+          "t_string_memory_ptr": {
+            "label": "string",
+            "numberOfBytes": "32"
+          },
+          "t_string_storage": {
+            "label": "string",
+            "numberOfBytes": "32"
+          },
+          "t_struct(ApproveInfo)1447_storage": {
+            "label": "struct UniversityDiploma.ApproveInfo",
+            "members": [
+              {
+                "label": "hash",
+                "type": "t_string_storage",
+                "offset": 0,
+                "slot": "0"
+              },
+              {
+                "label": "isApproved",
+                "type": "t_bool",
+                "offset": 0,
+                "slot": "1"
+              },
+              {
+                "label": "approverAddress",
+                "type": "t_address",
+                "offset": 1,
+                "slot": "1"
+              },
+              {
+                "label": "approvedAt",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "2"
+              }
+            ],
+            "numberOfBytes": "96"
+          },
+          "t_struct(Certification)1425_storage": {
+            "label": "struct UniversityDiploma.Certification",
+            "members": [
+              {
+                "label": "id",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "0"
+              },
+              {
+                "label": "certNum",
+                "type": "t_string_storage",
+                "offset": 0,
+                "slot": "1"
+              },
+              {
+                "label": "hash",
+                "type": "t_string_storage",
+                "offset": 0,
+                "slot": "2"
+              },
+              {
+                "label": "imageHash",
+                "type": "t_string_storage",
+                "offset": 0,
+                "slot": "3"
+              },
+              {
+                "label": "metaHash",
+                "type": "t_string_storage",
+                "offset": 0,
+                "slot": "4"
+              },
+              {
+                "label": "issuer",
+                "type": "t_address",
+                "offset": 0,
+                "slot": "5"
+              },
+              {
+                "label": "expireDate",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "6"
+              },
+              {
+                "label": "createdAt",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "7"
+              },
+              {
+                "label": "description",
+                "type": "t_string_storage",
+                "offset": 0,
+                "slot": "8"
+              },
+              {
+                "label": "txid",
+                "type": "t_string_storage",
+                "offset": 0,
+                "slot": "9"
+              },
+              {
+                "label": "revokeInfo",
+                "type": "t_struct(RevokeInfo)1438_storage",
+                "offset": 0,
+                "slot": "10"
+              },
+              {
+                "label": "approveInfo",
+                "type": "t_struct(ApproveInfo)1447_storage",
+                "offset": 0,
+                "slot": "15"
+              }
+            ],
+            "numberOfBytes": "576"
+          },
+          "t_struct(RevokeInfo)1438_storage": {
+            "label": "struct UniversityDiploma.RevokeInfo",
+            "members": [
+              {
+                "label": "hash",
+                "type": "t_string_storage",
+                "offset": 0,
+                "slot": "0"
+              },
+              {
+                "label": "isRevoked",
+                "type": "t_bool",
+                "offset": 0,
+                "slot": "1"
+              },
+              {
+                "label": "revokerAddress",
+                "type": "t_address",
+                "offset": 1,
+                "slot": "1"
+              },
+              {
+                "label": "revokerName",
+                "type": "t_string_storage",
+                "offset": 0,
+                "slot": "2"
+              },
+              {
+                "label": "description",
+                "type": "t_string_storage",
+                "offset": 0,
+                "slot": "3"
+              },
+              {
+                "label": "revokedAt",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "4"
+              }
+            ],
+            "numberOfBytes": "160"
           },
           "t_uint256": {
             "label": "uint256",
