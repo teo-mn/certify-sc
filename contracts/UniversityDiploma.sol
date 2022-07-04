@@ -37,7 +37,7 @@ contract UniversityDiploma is Initializable, OwnableUpgradeable {
         uint256 approvedAt;
     }
 
-    event Issued(address issuer, string hash, string imageHash, string certNum, uint256 timestamp);
+    event Issued(address issuer, string hash, string metaHash, string certNum, uint256 timestamp);
     event Revoked(address revoker, string hash, string certNum, uint256 timestamp);
     event Approved(address approver, string hash, string certNum, uint256 timestamp);
     event IssuerRegistrationAddressChanged(address oldAddr, address newAddr, uint256 timestamp);
@@ -106,7 +106,7 @@ contract UniversityDiploma is Initializable, OwnableUpgradeable {
         // use credit
         credits[msg.sender] --;
 
-        emit Issued(msg.sender, _hash, _imageHash, _certNum, block.timestamp);
+        emit Issued(msg.sender, _hash, _metaHash, _certNum, block.timestamp);
         return cert.id;
     }
 
