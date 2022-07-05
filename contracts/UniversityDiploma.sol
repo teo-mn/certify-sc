@@ -84,6 +84,7 @@ contract UniversityDiploma is Initializable, OwnableUpgradeable {
         Certification memory cert = certifications[_hash];
         RevokeInfo memory revokeInfo = revokeInfos[_hash];
         require(revokeInfo.isRevoked || cert.id == 0, "Certificate already registered");
+        checkCertNum(_certNum);
         // check credit
         require(credits[msg.sender] > 0, "Not enough credit");
         //check _expireDate
@@ -108,6 +109,12 @@ contract UniversityDiploma is Initializable, OwnableUpgradeable {
 
         emit Issued(msg.sender, _hash, _metaHash, _certNum, block.timestamp);
         return cert.id;
+    }
+
+    function checkCertNum(string memory _certNum) internal view {
+        Certification memory cert = mapByCertNum[_certNum];
+        RevokeInfo memory revokeInfo = revokeInfos[cert.hash];
+        require(cert.id == 0 || revokeInfo.isRevoked == true, "Already registered certification number");
     }
 
     function approve(string memory _hash) public {
@@ -173,6 +180,7 @@ contract UniversityDiploma is Initializable, OwnableUpgradeable {
         revokeInfo.revokerName = revokerName;
         revokeInfo.revokedAt = block.timestamp;
         revokeInfo.revokerAddress = msg.sender;
+
         certifications[cert.hash] = cert;
         mapByCertNum[cert.certNum] = cert;
         revokeInfos[cert.hash] = revokeInfo;
