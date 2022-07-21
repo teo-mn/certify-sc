@@ -4,7 +4,7 @@ const { ethers, upgrades } = require('hardhat');
 async function main () {
   const Class = await ethers.getContractFactory('UniversityDiploma');
   console.log('Upgrading ...');
-  await upgrades.upgradeProxy('0xc014B6653c13a2cd112Df0Ecbf06E8c3dB882a79', Class);
+  await upgrades.upgradeProxy('0xc0668aC1BE4393F9dA6c8eB81a24faA4F9B04Edb', Class);
   console.log('Upgraded');
 }
 

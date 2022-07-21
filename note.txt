@@ -1,0 +1,11 @@
+Testnet
+Verify.mn contract: 0xCc546a88Db1aF7d250a2F20Dee42eC436F99e075
+Diploma registration: 0xc0668aC1BE4393F9dA6c8eB81a24faA4F9B04Edb
+Issuer registration: 0x9dca2a5a5412C32930d6CAf8DC1e6c7C2DCd3483
+Credit address: 0x38E2313f80fe15386827b18Dc28d4089F201DA6a
+
+Mainnet
+Verify.mn contract: 0x5d305D8423c0f07bEaf15ba6a5264e0c88fC41B4
+Diploma registration:
+Issuer registration: 0x824B721ceaf50e66281c905F0e79F3EE45D52613
+Credit address:

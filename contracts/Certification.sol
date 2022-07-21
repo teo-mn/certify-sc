@@ -6,6 +6,7 @@ import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 
 import "./IssuerRegistration.sol";
 import "./SharedStructs.sol";
+import "./Credits.sol";
 
 contract CertificationRegistration is Initializable, OwnableUpgradeable {
     struct Certification {
@@ -23,6 +24,11 @@ contract CertificationRegistration is Initializable, OwnableUpgradeable {
         string txid;
     }
 
+    event Issued(address issuer, string hash, string certNum, uint256 timestamp);
+    event Revoked(address revoker, string hash, string certNum, uint256 timestamp);
+    event IssuerRegistrationAddressChanged(address oldAddr, address newAddr, uint256 timestamp);
+    event CreditAddressChanged(address oldAddr, address newAddr, uint256 timestamp);
+
     uint256 public id;
     address public creditAddress;
     mapping (string => Certification) public certifications; // hash->object
@@ -39,7 +45,14 @@ contract CertificationRegistration is Initializable, OwnableUpgradeable {
 
     function setIssuerRegistrationAddress(address _issuerRegistrationAddress) public onlyOwner {
         require(_issuerRegistrationAddress != address(0), "Invalid address");
+        address oldAddr = issuerRegistrationAddress;
         issuerRegistrationAddress = _issuerRegistrationAddress;
+        emit IssuerRegistrationAddressChanged(oldAddr, _issuerRegistrationAddress, block.timestamp);
+    }
+
+    function setCreditAddress(address _creditAddress) public onlyOwner {
+        require(_creditAddress != address(0), "Invalid address");
+        creditAddress = _creditAddress;
     }
 
     // Certificate, диплом шинээр бүртгэх
@@ -48,7 +61,7 @@ contract CertificationRegistration is Initializable, OwnableUpgradeable {
         Certification memory cert = certifications[_hash];
         require(cert.isRevoked || cert.id == 0, "Certificate already registered");
         // check credit
-        require(credits[msg.sender] > 0, "Not enough credit");
+        require(_getCredit(msg.sender) > 0, "Not enough credit");
         //check _expireDate
         require(_expireDate == 0 || block.timestamp < _expireDate, "Expire date can't be past");
         require(_expireDate == 0 || _expireDate < block.timestamp + 1000 * 365 * 24 * 60 * 60,
@@ -69,8 +82,20 @@ contract CertificationRegistration is Initializable, OwnableUpgradeable {
         mapById[cert.id] = cert;
         mapByCertNum[_certNum] = cert;
         // use credit
-        credits[msg.sender] --;
+        _useCredit(msg.sender);
+
+        emit Issued(msg.sender, _hash, _certNum, block.timestamp);
         return cert.id;
+    }
+
+    function _getCredit(address addr) view internal returns (uint256) {
+        Credits creditsContract = Credits(creditAddress);
+        return creditsContract.balanceOf(addr);
+    }
+
+    function _useCredit(address addr) internal returns (bool) {
+        Credits creditsContract = Credits(creditAddress);
+        return creditsContract.burn(addr, 1);
     }
 
     // сертификатын мэдээллийг файлын хашиар хайж олох
@@ -107,7 +132,7 @@ contract CertificationRegistration is Initializable, OwnableUpgradeable {
         require(msg.sender == cert.issuer, "Permission denied");
         require(cert.isRevoked == false, "Certification already revoked");
         // check credit
-        require(credits[msg.sender] > 0, "Not enough credit");
+        require(_getCredit(msg.sender) > 0, "Not enough credit");
         // revoke
         cert.isRevoked = true;
         cert.revokerName = revokerName;
@@ -116,18 +141,19 @@ contract CertificationRegistration is Initializable, OwnableUpgradeable {
         mapById[cert.id] = cert;
         mapByCertNum[cert.certNum] = cert;
         // use credit
-        credits[msg.sender] --;
+        _useCredit(msg.sender);
+
+        emit Revoked(msg.sender, cert.hash, cert.certNum, block.timestamp);
     }
 
     // Кредит цэнэглэх
     function chargeCredit(address addr, uint256 credit) payable public onlyOwner {
-        require(msg.value > 0, 'Value can not be zero');
-        credits[addr] += credit;
-        payable(addr).transfer(msg.value);
+        require(credit == 0, 'Deprecated');
+        require(addr == address(0), 'Deprecated');
     }
 
     function getCredit(address addr) view public returns (uint256) {
-        return credits[addr];
+        return _getCredit(addr);
     }
 
     function getIssuer(address issuer) view public returns (SharedStructs.Issuer memory) {
