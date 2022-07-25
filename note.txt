@@ -6,6 +6,6 @@ Credit address: 0x38E2313f80fe15386827b18Dc28d4089F201DA6a
 
 Mainnet
 Verify.mn contract: 0x5d305D8423c0f07bEaf15ba6a5264e0c88fC41B4
-Diploma registration:
+Diploma registration: 0xD882B76106d0Ba1a54DE30d620dC5c2892Ae1677
 Issuer registration: 0x824B721ceaf50e66281c905F0e79F3EE45D52613
-Credit address:
+Credit address: 0xfea819f5FD7782701e0229748D44159C2a267898
