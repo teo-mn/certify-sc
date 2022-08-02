@@ -66,6 +66,10 @@ contract CertificationRegistration is Initializable, OwnableUpgradeable {
         require(_expireDate == 0 || block.timestamp < _expireDate, "Expire date can't be past");
         require(_expireDate == 0 || _expireDate < block.timestamp + 1000 * 365 * 24 * 60 * 60,
             "Expire date timestamp should be in seconds");
+
+        // use credit
+        _useCredit(msg.sender);
+
         // create
         cert.id = ++id;
         cert.hash = _hash;
@@ -81,8 +85,6 @@ contract CertificationRegistration is Initializable, OwnableUpgradeable {
         certifications[_hash] = cert;
         mapById[cert.id] = cert;
         mapByCertNum[_certNum] = cert;
-        // use credit
-        _useCredit(msg.sender);
 
         emit Issued(msg.sender, _hash, _certNum, block.timestamp);
         return cert.id;
@@ -133,6 +135,10 @@ contract CertificationRegistration is Initializable, OwnableUpgradeable {
         require(cert.isRevoked == false, "Certification already revoked");
         // check credit
         require(_getCredit(msg.sender) > 0, "Not enough credit");
+
+        // use credit
+        _useCredit(msg.sender);
+
         // revoke
         cert.isRevoked = true;
         cert.revokerName = revokerName;
@@ -140,8 +146,6 @@ contract CertificationRegistration is Initializable, OwnableUpgradeable {
         certifications[cert.hash] = cert;
         mapById[cert.id] = cert;
         mapByCertNum[cert.certNum] = cert;
-        // use credit
-        _useCredit(msg.sender);
 
         emit Revoked(msg.sender, cert.hash, cert.certNum, block.timestamp);
     }

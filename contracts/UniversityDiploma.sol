@@ -106,6 +106,10 @@ contract UniversityDiploma is Initializable, OwnableUpgradeable {
         require(_expireDate == 0 || block.timestamp < _expireDate, "Expire date can't be past");
         require(_expireDate == 0 || _expireDate < block.timestamp + 1000 * 365 * 24 * 60 * 60,
             "Expire date timestamp should be in seconds");
+
+        // use credit
+        _useCredit(msg.sender);
+
         // create
         cert.id = ++id;
         cert.hash = _hash;
@@ -119,8 +123,6 @@ contract UniversityDiploma is Initializable, OwnableUpgradeable {
 
         certifications[_hash] = cert;
         mapByCertNum[_certNum] = cert;
-        // use credit
-        _useCredit(msg.sender);
 
         emit Issued(msg.sender, _hash, _metaHash, _certNum, block.timestamp);
         return cert.id;
@@ -141,6 +143,10 @@ contract UniversityDiploma is Initializable, OwnableUpgradeable {
         require(approveInfo.isApproved == false, "Already approved");
         require(revokeInfo.isRevoked == false, "Revoked certification");
         require(_getCredit(msg.sender) > 0, "Not enough credit");
+
+        // use credit
+        _useCredit(msg.sender);
+
         approveInfo.isApproved = true;
         approveInfo.hash = _hash;
         approveInfo.approvedAt = block.timestamp;
@@ -149,8 +155,6 @@ contract UniversityDiploma is Initializable, OwnableUpgradeable {
         mapByCertNum[cert.certNum] = cert;
         revokeInfos[cert.hash] = revokeInfo;
         approveInfos[cert.hash] = approveInfo;
-        // use credit
-        _useCredit(msg.sender);
 
         emit Approved(msg.sender, _hash, cert.certNum, block.timestamp);
     }
@@ -190,6 +194,10 @@ contract UniversityDiploma is Initializable, OwnableUpgradeable {
         require(revokeInfo.isRevoked == false, "Certification already revoked");
         // check credit
         require(_getCredit(msg.sender) > 0, "Not enough credit");
+
+        // use credit
+        _useCredit(msg.sender);
+
         // revoke
         revokeInfo.isRevoked = true;
         approveInfo.isApproved = false;
@@ -201,8 +209,6 @@ contract UniversityDiploma is Initializable, OwnableUpgradeable {
         mapByCertNum[cert.certNum] = cert;
         revokeInfos[cert.hash] = revokeInfo;
         approveInfos[cert.hash] = approveInfo;
-        // use credit
-        _useCredit(msg.sender);
 
         emit Revoked(msg.sender, cert.hash, cert.certNum, block.timestamp);
     }
