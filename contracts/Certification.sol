@@ -22,6 +22,7 @@ contract CertificationRegistration is Initializable, OwnableUpgradeable {
         string revokerName;
         uint256 revokedAt;
         string txid;
+        string[] childHashes;
     }
 
     event Issued(address issuer, string hash, string certNum, uint256 timestamp);
@@ -37,6 +38,8 @@ contract CertificationRegistration is Initializable, OwnableUpgradeable {
 
     mapping (address => uint256) public credits;
     address public issuerRegistrationAddress;
+
+    mapping (string => string) public parentHash;
 
     function initialize() public initializer {
         id = 0;
@@ -57,6 +60,20 @@ contract CertificationRegistration is Initializable, OwnableUpgradeable {
 
     // Certificate, диплом шинээр бүртгэх
     function addCertification(string memory _hash, string memory _certNum, uint256 _expireDate, string memory _version, string memory _desc) public returns (uint256) {
+        string[] memory childHashes;
+        return addCertificationUtil(_hash, childHashes, _certNum, _expireDate, _version, _desc);
+    }
+
+    // Certificate, диплом шинээр бүртгэх
+    function addCertification(string memory _hash, string[] memory childHashes, string memory _certNum, uint256 _expireDate, string memory _version, string memory _desc) public returns (uint256) {
+        uint256 new_id = addCertificationUtil(_hash, childHashes, _certNum, _expireDate, _version, _desc);
+        for (uint8 i=0;i<childHashes.length;i++) {
+            parentHash[childHashes[i]] = _hash;
+        }
+        return new_id;
+    }
+
+    function addCertificationUtil(string memory _hash, string[] memory _childHashes, string memory _certNum, uint256 _expireDate, string memory _version, string memory _desc) internal returns (uint256){
         // check exists
         Certification memory cert = certifications[_hash];
         require(cert.isRevoked || cert.id == 0, "Certificate already registered");
@@ -72,6 +89,8 @@ contract CertificationRegistration is Initializable, OwnableUpgradeable {
 
         // create
         cert.id = ++id;
+        cert.childHashes = _childHashes;
+        cert.certNum = _certNum;
         cert.hash = _hash;
         cert.issuer = msg.sender;
         cert.expireDate = _expireDate;
@@ -102,7 +121,13 @@ contract CertificationRegistration is Initializable, OwnableUpgradeable {
 
     // сертификатын мэдээллийг файлын хашиар хайж олох
     function getCertification(string memory hash) view public returns (Certification memory) {
-        return certifications[hash];
+        string memory parent = parentHash[hash];
+        if (keccak256(abi.encodePacked(parent)) == keccak256(abi.encodePacked(''))) {
+            return certifications[hash];
+        }
+        else {
+            return certifications[parentHash[hash]];
+        }
     }
 
     // сертификатын мэдээллийг No(дипломын дугаараар хайж олох)
