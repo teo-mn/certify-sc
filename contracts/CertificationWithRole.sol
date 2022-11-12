@@ -83,12 +83,12 @@ contract CertificationRegistrationWithRole is Initializable, OwnableUpgradeable,
         uint256 _expireDate,
         string memory _version, string memory _desc)
     public onlyRole(ISSUER_ROLE) returns (uint256) {
-        uint256 new_id = addCertificationUtil(_hash, childHashes, _certNum, _expireDate, _version, _desc);
         for (uint8 i = 0; i < childHashes.length; i++) {
             Certification memory cert = getCertification(childHashes[i]);
             require(cert.isRevoked || cert.id == 0, "Certificate already registered");
             parentHash[childHashes[i]] = _hash;
         }
+        uint256 new_id = addCertificationUtil(_hash, childHashes, _certNum, _expireDate, _version, _desc);
         return new_id;
     }
 
