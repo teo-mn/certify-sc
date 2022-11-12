@@ -3,12 +3,15 @@ pragma solidity ^0.8.1;
 
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
+import "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol";
 
 import "./IssuerRegistration.sol";
 import "./SharedStructs.sol";
 import "./Credits.sol";
 
-contract CertificationRegistration is Initializable, OwnableUpgradeable {
+contract CertificationRegistrationWithRole is Initializable, OwnableUpgradeable, AccessControlUpgradeable {
+    bytes32 public constant ISSUER_ROLE = keccak256("ISSUER_ROLE");
+
     struct Certification {
         uint256 id;
         string certNum; // Дипломын дугаар
@@ -22,6 +25,7 @@ contract CertificationRegistration is Initializable, OwnableUpgradeable {
         string revokerName;
         uint256 revokedAt;
         string txid;
+        string[] childHashes;
     }
 
     event Issued(address issuer, string hash, string certNum, uint256 timestamp);
@@ -31,16 +35,22 @@ contract CertificationRegistration is Initializable, OwnableUpgradeable {
 
     uint256 public id;
     address public creditAddress;
-    mapping (string => Certification) public certifications; // hash->object
-    mapping (uint256 => Certification) public mapById;
-    mapping (string => Certification) public mapByCertNum;
+    mapping(string => Certification) public certifications; // hash->object
+    mapping(uint256 => Certification) public mapById;
+    mapping(string => Certification) public mapByCertNum;
 
-    mapping (address => uint256) public credits;
     address public issuerRegistrationAddress;
 
-    function initialize() public initializer {
+    mapping(string => string) public parentHash;
+
+    function initialize(address _creditAddress, address _issuerRegistrationAddress) public initializer {
         id = 0;
         __Ownable_init();
+        __AccessControl_init();
+        _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);
+        _grantRole(ISSUER_ROLE, msg.sender);
+        creditAddress = _creditAddress;
+        issuerRegistrationAddress = _issuerRegistrationAddress;
     }
 
     function setIssuerRegistrationAddress(address _issuerRegistrationAddress) public onlyOwner {
@@ -56,13 +66,45 @@ contract CertificationRegistration is Initializable, OwnableUpgradeable {
     }
 
     // Certificate, диплом шинээр бүртгэх
-    function addCertification(string memory _hash, string memory _certNum, uint256 _expireDate, string memory _version, string memory _desc) public returns (uint256) {
+    function addCertification(string memory _hash,
+        string memory _certNum,
+        uint256 _expireDate,
+        string memory _version,
+        string memory _desc)
+    public onlyRole(ISSUER_ROLE) returns (uint256) {
+        string[] memory childHashes;
+        return addCertificationUtil(_hash, childHashes, _certNum, _expireDate, _version, _desc);
+    }
+
+    // Certificate, диплом шинээр бүртгэх
+    function addCertification(string memory _hash,
+        string[] memory childHashes,
+        string memory _certNum,
+        uint256 _expireDate,
+        string memory _version, string memory _desc)
+    public onlyRole(ISSUER_ROLE) returns (uint256) {
+        uint256 new_id = addCertificationUtil(_hash, childHashes, _certNum, _expireDate, _version, _desc);
+        for (uint8 i = 0; i < childHashes.length; i++) {
+            Certification memory cert = getCertification(childHashes[i]);
+            require(cert.isRevoked || cert.id == 0, "Certificate already registered");
+            parentHash[childHashes[i]] = _hash;
+        }
+        return new_id;
+    }
+
+    function addCertificationUtil(string memory _hash,
+        string[] memory _childHashes,
+        string memory _certNum,
+        uint256 _expireDate,
+        string memory _version,
+        string memory _desc)
+    internal returns (uint256) {
         // check exists
-        Certification memory cert = certifications[_hash];
+        Certification memory cert = getCertification(_hash);
         require(cert.isRevoked || cert.id == 0, "Certificate already registered");
         // check credit
         require(_getCredit(msg.sender) > 0, "Not enough credit");
-        //check _expireDate
+        // check _expireDate
         require(_expireDate == 0 || block.timestamp < _expireDate, "Expire date can't be past");
         require(_expireDate == 0 || _expireDate < block.timestamp + 1000 * 365 * 24 * 60 * 60,
             "Expire date timestamp should be in seconds");
@@ -72,6 +114,7 @@ contract CertificationRegistration is Initializable, OwnableUpgradeable {
 
         // create
         cert.id = ++id;
+        cert.childHashes = _childHashes;
         cert.certNum = _certNum;
         cert.hash = _hash;
         cert.issuer = msg.sender;
@@ -103,7 +146,13 @@ contract CertificationRegistration is Initializable, OwnableUpgradeable {
 
     // сертификатын мэдээллийг файлын хашиар хайж олох
     function getCertification(string memory hash) view public returns (Certification memory) {
-        return certifications[hash];
+        string memory parent = parentHash[hash];
+        if (keccak256(abi.encodePacked(parent)) == keccak256(abi.encodePacked(''))) {
+            return certifications[hash];
+        }
+        else {
+            return certifications[parentHash[hash]];
+        }
     }
 
     // сертификатын мэдээллийг No(дипломын дугаараар хайж олох)
@@ -153,8 +202,8 @@ contract CertificationRegistration is Initializable, OwnableUpgradeable {
 
     // Кредит цэнэглэх
     function chargeCredit(address addr, uint256 credit) payable public onlyOwner {
-        require(credit == 0, 'Deprecated');
-        require(addr == address(0), 'Deprecated');
+        require(credit == 0, "Deprecated");
+        require(addr == address(0), "Deprecated");
     }
 
     function getCredit(address addr) view public returns (uint256) {
