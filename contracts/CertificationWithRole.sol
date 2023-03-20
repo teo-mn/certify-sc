@@ -38,6 +38,7 @@ contract CertificationRegistrationWithRole is Initializable, OwnableUpgradeable,
     mapping(string => Certification) public certifications; // hash->object
     mapping(uint256 => Certification) public mapById;
     mapping(string => Certification) public mapByCertNum;
+    mapping(string => uint8) public childHashCount;
 
     address public issuerRegistrationAddress;
 
@@ -83,11 +84,6 @@ contract CertificationRegistrationWithRole is Initializable, OwnableUpgradeable,
         uint256 _expireDate,
         string memory _version, string memory _desc)
     public onlyRole(ISSUER_ROLE) returns (uint256) {
-        for (uint8 i = 0; i < childHashes.length; i++) {
-            Certification memory cert = getCertification(childHashes[i]);
-            require(cert.isRevoked || cert.id == 0, "Certificate already registered");
-            parentHash[childHashes[i]] = _hash;
-        }
         uint256 new_id = addCertificationUtil(_hash, childHashes, _certNum, _expireDate, _version, _desc);
         return new_id;
     }
@@ -115,6 +111,11 @@ contract CertificationRegistrationWithRole is Initializable, OwnableUpgradeable,
         // create
         cert.id = ++id;
         cert.childHashes = _childHashes;
+
+        for (uint8 i = 0; i < _childHashes.length; i++) {
+            childHashCount[_childHashes[i]] = childHashCount[_childHashes[i]] + 1;
+        }
+
         cert.certNum = _certNum;
         cert.hash = _hash;
         cert.issuer = msg.sender;
@@ -146,13 +147,7 @@ contract CertificationRegistrationWithRole is Initializable, OwnableUpgradeable,
 
     // сертификатын мэдээллийг файлын хашиар хайж олох
     function getCertification(string memory hash) view public returns (Certification memory) {
-        string memory parent = parentHash[hash];
-        if (keccak256(abi.encodePacked(parent)) == keccak256(abi.encodePacked(''))) {
-            return certifications[hash];
-        }
-        else {
-            return certifications[parentHash[hash]];
-        }
+        return certifications[hash];
     }
 
     // сертификатын мэдээллийг No(дипломын дугаараар хайж олох)
@@ -197,7 +192,18 @@ contract CertificationRegistrationWithRole is Initializable, OwnableUpgradeable,
         mapById[cert.id] = cert;
         mapByCertNum[cert.certNum] = cert;
 
+        // child hashes update
+        for(uint8 i=0;i<cert.childHashes.length;i++) {
+            if (childHashCount[cert.childHashes[i]] != 0) {
+                childHashCount[cert.childHashes[i]] = childHashCount[cert.childHashes[i]] - 1;
+            }
+        }
+
         emit Revoked(msg.sender, cert.hash, cert.certNum, block.timestamp);
+    }
+
+    function getChildHashCount(string memory hash) view public returns (uint8) {
+        return childHashCount[hash];
     }
 
     // Кредит цэнэглэх
