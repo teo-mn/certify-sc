@@ -28,8 +28,8 @@ contract CertificationRegistrationWithRole is Initializable, OwnableUpgradeable,
         string[] childHashes;
     }
 
-    event Issued(address issuer, string hash, string certNum, uint256 timestamp);
-    event Revoked(address revoker, string hash, string certNum, uint256 timestamp);
+    event Issued(address indexed issuer, string indexed hash, string indexed certNum, uint256 timestamp);
+    event Revoked(address indexed revoker, string  indexed hash, string  indexed certNum, uint256 timestamp);
     event IssuerRegistrationAddressChanged(address oldAddr, address newAddr, uint256 timestamp);
     event CreditAddressChanged(address oldAddr, address newAddr, uint256 timestamp);
 
@@ -193,7 +193,7 @@ contract CertificationRegistrationWithRole is Initializable, OwnableUpgradeable,
         mapByCertNum[cert.certNum] = cert;
 
         // child hashes update
-        for(uint8 i=0;i<cert.childHashes.length;i++) {
+        for (uint8 i = 0; i < cert.childHashes.length; i++) {
             if (childHashCount[cert.childHashes[i]] != 0) {
                 childHashCount[cert.childHashes[i]] = childHashCount[cert.childHashes[i]] - 1;
             }
