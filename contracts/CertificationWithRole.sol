@@ -28,8 +28,8 @@ contract CertificationRegistrationWithRole is Initializable, OwnableUpgradeable,
         string[] childHashes;
     }
 
-    event Issued(address indexed issuer, string indexed hash, string indexed certNum, uint256 timestamp);
-    event Revoked(address indexed revoker, string  indexed hash, string  indexed certNum, uint256 timestamp);
+    event Issued(address indexed issuer, string hash, string certNum, uint256 timestamp);
+    event Revoked(address indexed revoker, string  hash, string certNum, uint256 timestamp);
     event IssuerRegistrationAddressChanged(address oldAddr, address newAddr, uint256 timestamp);
     event CreditAddressChanged(address oldAddr, address newAddr, uint256 timestamp);
 
