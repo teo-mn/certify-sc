@@ -96,21 +96,48 @@ contract UniversityDiploma is Initializable, OwnableUpgradeable {
     function addCertification(string memory _hash, string memory _imageHash, string memory _metaHash,
         string memory _certNum, uint256 _expireDate, string memory _desc) public returns (uint256) {
         // check exists
+        validateCertificationRequest(_hash, _imageHash, _metaHash, _certNum, _expireDate, _desc);
+
+        // use credit
+        _useCredit(msg.sender);
+
+        // create
+        return addCertificationUtil(_hash, _imageHash, _metaHash, _certNum, _expireDate, _desc);
+    }
+
+    function validateCertificationRequest(string memory _hash, string memory _imageHash, string memory _metaHash,
+        string memory _certNum, uint256 _expireDate, string memory _desc) internal {
         Certification memory cert = certifications[_hash];
         RevokeInfo memory revokeInfo = revokeInfos[_hash];
         require(revokeInfo.isRevoked || cert.id == 0, "Certificate already registered");
         checkCertNum(_certNum);
         // check credit
         require(_getCredit(msg.sender) > 0, "Not enough credit");
-        //check _expireDate
+        // check _expireDate
         require(_expireDate == 0 || block.timestamp < _expireDate, "Expire date can't be past");
         require(_expireDate == 0 || _expireDate < block.timestamp + 1000 * 365 * 24 * 60 * 60,
             "Expire date timestamp should be in seconds");
+    }
 
+    // Certificate, диплом шинээр бүртгэх
+    function addApprovedCertification(string memory _hash, string memory _imageHash, string memory _metaHash,
+        string memory _certNum, uint256 _expireDate, string memory _desc, bytes memory signature) public returns (uint256) {
+        // verify signature
+        // check exists
+        validateCertificationRequest(_hash, _imageHash, _metaHash, _certNum, _expireDate, _desc);
         // use credit
         _useCredit(msg.sender);
 
         // create
+        uint256 cert_id = addCertificationUtil(_has, _imageHash, _metaHash, _certNum, _expireDate, _desc);
+        approveUtil(_hash, approver);
+        return cert_id;
+    }
+
+    function addCertificationUtil(string memory _hash, string memory _imageHash, string memory _metaHash,
+        string memory _certNum, uint256 _expireDate, string memory _desc) internal {
+        // create
+        Certification memory cert = certifications[_hash];
         cert.id = ++id;
         cert.hash = _hash;
         cert.metaHash = _metaHash;
@@ -146,17 +173,20 @@ contract UniversityDiploma is Initializable, OwnableUpgradeable {
 
         // use credit
         _useCredit(msg.sender);
+        approveUtil(_hash, msg.sender);
+    }
 
+    function approveUtil(string memory _hash, address _approver) internal {
+        Certification memory cert = certifications[_hash];
+        ApproveInfo memory approveInfo = approveInfos[_hash];
         approveInfo.isApproved = true;
         approveInfo.hash = _hash;
         approveInfo.approvedAt = block.timestamp;
-        approveInfo.approverAddress = msg.sender;
+        approveInfo.approverAddress = _approver;
 
-        mapByCertNum[cert.certNum] = cert;
-        revokeInfos[cert.hash] = revokeInfo;
         approveInfos[cert.hash] = approveInfo;
 
-        emit Approved(msg.sender, _hash, cert.certNum, block.timestamp);
+        emit Approved(_approver, _hash, cert.certNum, block.timestamp);
     }
 
     // сертификатын мэдээллийг файлын хашиар хайж олох
