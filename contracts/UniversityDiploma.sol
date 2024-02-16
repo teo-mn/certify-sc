@@ -129,13 +129,13 @@ contract UniversityDiploma is Initializable, OwnableUpgradeable {
         _useCredit(msg.sender);
 
         // create
-        uint256 cert_id = addCertificationUtil(_has, _imageHash, _metaHash, _certNum, _expireDate, _desc);
+        uint256 cert_id = addCertificationUtil(_hash, _imageHash, _metaHash, _certNum, _expireDate, _desc);
         approveUtil(_hash, approver);
         return cert_id;
     }
 
     function addCertificationUtil(string memory _hash, string memory _imageHash, string memory _metaHash,
-        string memory _certNum, uint256 _expireDate, string memory _desc) internal {
+        string memory _certNum, uint256 _expireDate, string memory _desc) internal returns (uint256){
         // create
         Certification memory cert = certifications[_hash];
         cert.id = ++id;
