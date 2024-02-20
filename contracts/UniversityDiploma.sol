@@ -150,6 +150,13 @@ contract UniversityDiploma is Initializable, OwnableUpgradeable {
 
         certifications[_hash] = cert;
         mapByCertNum[_certNum] = cert;
+        revokeInfo.isRevoked = false;
+        revokeInfo.revokerAddress = address(0);
+        revokeInfo.revokerName = '';
+        revokeInfo.revokedAt = 0;
+        revokeInfo.description = '';
+        revokeInfo.hash = '';
+        revokeInfos[cert.hash] = revokeInfo;
 
         emit Issued(msg.sender, _hash, _metaHash, _certNum, block.timestamp);
         return cert.id;
@@ -231,6 +238,9 @@ contract UniversityDiploma is Initializable, OwnableUpgradeable {
         // revoke
         revokeInfo.isRevoked = true;
         approveInfo.isApproved = false;
+        approveInfo.approvedAt = 0;
+        approveInfo.approverAddress = address(0);
+        approveInfo.hash = '';
         revokeInfo.revokerName = revokerName;
         revokeInfo.revokedAt = block.timestamp;
         revokeInfo.revokerAddress = msg.sender;
