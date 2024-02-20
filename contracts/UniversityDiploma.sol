@@ -150,6 +150,8 @@ contract UniversityDiploma is Initializable, OwnableUpgradeable {
 
         certifications[_hash] = cert;
         mapByCertNum[_certNum] = cert;
+
+        RevokeInfo memory revokeInfo = revokeInfos[_hash];
         revokeInfo.isRevoked = false;
         revokeInfo.revokerAddress = address(0);
         revokeInfo.revokerName = '';
