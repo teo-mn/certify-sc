@@ -27,32 +27,32 @@ module.exports = {
     settings: {
       optimizer: {
         enabled: true,
-        runs: 2,
-      },
+        runs: 2
+      }
     }
   },
   networks: {
     ropsten: {
       url: process.env.ROPSTEN_URL || "",
       accounts:
-        process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
+        process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : []
     },
     corexchain_test: {
       url: process.env.COREX_TEST_URL || "",
       accounts:
-          process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
+          process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : []
     },
     corexchain: {
       url: process.env.COREX_URL || "",
       accounts:
-          process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
-    },
+          process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : []
+    }
   },
   gasReporter: {
     enabled: process.env.REPORT_GAS !== undefined,
-    currency: "USD",
+    currency: "USD"
   },
   etherscan: {
-    apiKey: process.env.ETHERSCAN_API_KEY,
-  },
+    apiKey: process.env.ETHERSCAN_API_KEY
+  }
 };
