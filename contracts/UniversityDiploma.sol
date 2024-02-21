@@ -241,6 +241,10 @@ contract UniversityDiploma is Initializable, OwnableUpgradeable {
         emit Revoked(msg.sender, cert.hash, cert.certNum, block.timestamp);
     }
 
+    function getCredit(address addr) view public returns (uint256) {
+        return _getCredit(addr);
+    }
+
     function getIssuer(address issuer) view public returns (SharedStructs.Issuer memory) {
         IssuerRegistration ir = IssuerRegistration(issuerRegistrationAddress);
         return ir.getIssuer(issuer);
