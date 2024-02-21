@@ -123,20 +123,10 @@ contract UniversityDiploma is Initializable, OwnableUpgradeable {
     ) public pure returns (bytes32 r, bytes32 s, uint8 v) {
         require(sig.length == 65, "invalid signature length");
         assembly {
-        /*
-        First 32 bytes stores the length of the signature
-        add(sig, 32) = pointer of sig + 32
-        effectively, skips first 32 bytes of signature
-        mload(p) loads next 32 bytes starting at the memory address p into memory
-        */
-        // first 32 bytes, after the length prefix
             r := mload(add(sig, 32))
-        // second 32 bytes
             s := mload(add(sig, 64))
-        // final byte (first byte of the next 32 bytes)
             v := byte(0, mload(add(sig, 96)))
         }
-        // implicitly return (r, s, v)
     }
 
     function getMetaCertNumHash(string memory _metaHash, string memory _certNum) public pure returns (bytes32) {
@@ -153,15 +143,11 @@ contract UniversityDiploma is Initializable, OwnableUpgradeable {
     // Certificate, диплом шинээр бүртгэх
     function addApprovedCertification(string memory _hash, string memory _imageHash, string memory _metaHash,
         string memory _certNum, uint256 _expireDate, string memory _desc, bytes memory signature) public returns (uint256) {
-        // verify signature
         address signer = recoverSigner(_metaHash, _certNum, signature);
         require(signer == approver, "Wrong signature");
-        // check exists
         validateCertificationRequest(_hash, _imageHash, _metaHash, _certNum, _expireDate, _desc);
-        // use credit
         _useCredit(msg.sender);
 
-        // create
         uint256 cert_id = addCertificationUtil(_hash, _imageHash, _metaHash, _certNum, _expireDate, _desc);
         approveUtil(_hash, approver);
         return cert_id;
@@ -169,7 +155,6 @@ contract UniversityDiploma is Initializable, OwnableUpgradeable {
 
     function addCertificationUtil(string memory _hash, string memory _imageHash, string memory _metaHash,
         string memory _certNum, uint256 _expireDate, string memory _desc) internal returns (uint256){
-        // create
         Certification memory cert = certifications[_hash];
         cert.id = ++id;
         cert.hash = _hash;
@@ -184,13 +169,7 @@ contract UniversityDiploma is Initializable, OwnableUpgradeable {
         certifications[_hash] = cert;
         mapByCertNum[_certNum] = cert;
 
-        RevokeInfo memory revokeInfo = revokeInfos[_hash];
-        revokeInfo.isRevoked = false;
-        revokeInfo.revokerAddress = address(0);
-        revokeInfo.revokerName = '';
-        revokeInfo.revokedAt = 0;
-        revokeInfo.description = '';
-        revokeInfo.hash = '';
+        RevokeInfo memory revokeInfo = RevokeInfo('', false, address(0), '', '', 0);
         revokeInfos[cert.hash] = revokeInfo;
 
         emit Issued(msg.sender, _hash, _metaHash, _certNum, block.timestamp);
@@ -213,89 +192,53 @@ contract UniversityDiploma is Initializable, OwnableUpgradeable {
         require(revokeInfo.isRevoked == false, "Revoked certification");
         require(_getCredit(msg.sender) > 0, "Not enough credit");
 
-        // use credit
         _useCredit(msg.sender);
         approveUtil(_hash, msg.sender);
     }
 
     function approveUtil(string memory _hash, address _approver) internal {
         Certification memory cert = certifications[_hash];
-        ApproveInfo memory approveInfo = approveInfos[_hash];
-        approveInfo.isApproved = true;
-        approveInfo.hash = _hash;
-        approveInfo.approvedAt = block.timestamp;
-        approveInfo.approverAddress = _approver;
-
+        ApproveInfo memory approveInfo = ApproveInfo(_hash, true, _approver, block.timestamp);
         approveInfos[cert.hash] = approveInfo;
-
         emit Approved(_approver, _hash, cert.certNum, block.timestamp);
     }
 
-    // сертификатын мэдээллийг файлын хашиар хайж олох
     function getCertification(string memory hash) view public returns (Certification memory) {
         return certifications[hash];
     }
 
-    // сертификатын revoke мэдээллийг файлын хашиар хайж олох
     function getRevokeInfo(string memory hash) view public returns (RevokeInfo memory) {
         return revokeInfos[hash];
     }
-    // сертификатын approve мэдээллийг файлын хашиар хайж олох
     function getApproveInfo(string memory hash) view public returns (ApproveInfo memory) {
         return approveInfos[hash];
     }
 
-    // сертификатын мэдээллийг No(дипломын дугаараар хайж олох)
     function getCertificationByCertNum(string memory certNum) view public returns (Certification memory) {
         return mapByCertNum[certNum];
     }
 
-    // дипломыг буцаах
     function revoke(string memory hash, string memory revokerName) public {
         Certification memory cert = certifications[hash];
         revokeUtil(cert, revokerName);
     }
 
     function revokeUtil(Certification memory cert, string memory revokerName) internal {
-        // check exists
         require(cert.id > 0, "Certification not found");
-        // check issuer
         require(msg.sender == cert.issuer || msg.sender == approver, "Permission denied");
         RevokeInfo memory revokeInfo = revokeInfos[cert.hash];
-        ApproveInfo memory approveInfo = approveInfos[cert.hash];
         require(revokeInfo.isRevoked == false, "Certification already revoked");
-        // check credit
         require(_getCredit(msg.sender) > 0, "Not enough credit");
 
-        // use credit
         _useCredit(msg.sender);
-
-        // revoke
-        revokeInfo.isRevoked = true;
-        approveInfo.isApproved = false;
-        approveInfo.approvedAt = 0;
-        approveInfo.approverAddress = address(0);
-        approveInfo.hash = '';
-        revokeInfo.revokerName = revokerName;
-        revokeInfo.revokedAt = block.timestamp;
-        revokeInfo.revokerAddress = msg.sender;
-
         certifications[cert.hash] = cert;
         mapByCertNum[cert.certNum] = cert;
+        revokeInfo = RevokeInfo(cert.hash, true, msg.sender, revokerName, '', 0);
         revokeInfos[cert.hash] = revokeInfo;
+        ApproveInfo memory approveInfo = ApproveInfo('', false, address(0), 0);
         approveInfos[cert.hash] = approveInfo;
 
         emit Revoked(msg.sender, cert.hash, cert.certNum, block.timestamp);
-    }
-
-    // Кредит цэнэглэх
-    function chargeCredit(address addr, uint256 credit) payable public onlyOwner {
-        require(credit == 0, 'Deprecated');
-        require(addr == address(0), 'Deprecated');
-    }
-
-    function getCredit(address addr) view public returns (uint256) {
-        return _getCredit(addr);
     }
 
     function getIssuer(address issuer) view public returns (SharedStructs.Issuer memory) {
