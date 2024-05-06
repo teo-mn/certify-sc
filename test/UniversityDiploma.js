@@ -246,7 +246,7 @@ describe("University Diploma Contract", function () {
             const hashedMessage = ethers.utils.arrayify(encodePacked);
             const signature = await approver.signMessage(hashedMessage);
             await expect(instance.connect(otherAccount).addApprovedCertification("hash", "imageHash", "metaHash", "certNum", 0, "", signature)).not.to.be.reverted
-            cert = await instance.getCertification("hash")
+            let cert = await instance.getCertification("hash")
             expect(cert[1]).to.equal("certNum")
             expect(cert[2]).to.equal("hash")
             expect(cert[3]).to.equal("imageHash")

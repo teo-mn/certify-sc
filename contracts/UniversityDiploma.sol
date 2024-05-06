@@ -43,6 +43,9 @@ contract UniversityDiploma is Initializable, OwnableUpgradeable {
     event Approved(address approver, string hash, string certNum, uint256 timestamp);
     event IssuerRegistrationAddressChanged(address oldAddr, address newAddr, uint256 timestamp);
     event ApproverAddressChanged(address oldAddr, address newAddr, uint256 timestamp);
+    event ApproverAddressAdded(address addr);
+    event ApproverAddressRemoved(address addr);
+    event UpdatedQrCodeData(string certNum, string qrDataHash);
 
     uint256 public id;
     address public creditAddress;
@@ -56,9 +59,17 @@ contract UniversityDiploma is Initializable, OwnableUpgradeable {
     mapping(address => uint256) public credits;
     address public issuerRegistrationAddress;
 
+    mapping(string => string) public qrDataMap;
+    mapping(address => bool) public isApprover;
+
     function initialize() public initializer {
         id = 0;
         __Ownable_init();
+    }
+
+    modifier onlyApprover() {
+        require(isApprover[_msgSender()] || approver == _msgSender(), "Caller is not approver");
+        _;
     }
 
     function setCreditAddress(address _creditAddress) public onlyOwner {
@@ -76,14 +87,6 @@ contract UniversityDiploma is Initializable, OwnableUpgradeable {
         return creditsContract.burn(addr, 1);
     }
 
-    function setIssuerRegistrationAddress(address _issuerRegistrationAddress) public onlyOwner {
-        require(_issuerRegistrationAddress != address(0), "Invalid address");
-        address oldAddr = issuerRegistrationAddress;
-        issuerRegistrationAddress = _issuerRegistrationAddress;
-
-        emit IssuerRegistrationAddressChanged(oldAddr, _issuerRegistrationAddress, block.timestamp);
-    }
-
     function setApproverAddress(address _approverAddress) public onlyOwner {
         require(_approverAddress != address(0), "Invalid address");
         address old = approver;
@@ -92,7 +95,31 @@ contract UniversityDiploma is Initializable, OwnableUpgradeable {
         emit ApproverAddressChanged(old, _approverAddress, block.timestamp);
     }
 
-    // Certificate, диплом шинээр бүртгэх
+    function setApprover(address _addr) public onlyOwner {
+        require(_addr != address(0), "Invalid address");
+        require(isApprover[_addr] != true, "Already approver address");
+        isApprover[_addr] = true;
+
+        emit ApproverAddressAdded(_addr);
+    }
+
+    function removeApprover(address _addr) public onlyOwner {
+        require(_addr != address(0), "Invalid address");
+        require(isApprover[_addr] == true, "Not approver address");
+        isApprover[_addr] = false;
+        emit ApproverAddressRemoved(_addr);
+    }
+
+    function setQrCodeData(string  memory _certNum, string  memory _qrDataHash) public onlyApprover {
+        qrDataMap[_certNum] = _qrDataHash;
+
+        emit UpdatedQrCodeData(_certNum, _qrDataHash);
+    }
+
+    function getQrCodeData(string memory _certNum) public returns (string memory) {
+        return qrDataMap[_certNum];
+    }
+
     function addCertification(string memory _hash, string memory _imageHash, string memory _metaHash,
         string memory _certNum, uint256 _expireDate, string memory _desc) public returns (uint256) {
         // check exists
@@ -118,6 +145,7 @@ contract UniversityDiploma is Initializable, OwnableUpgradeable {
         require(_expireDate == 0 || _expireDate < block.timestamp + 1000 * 365 * 24 * 60 * 60,
             "Expire date timestamp should be in seconds");
     }
+
     function splitSignature(
         bytes memory sig
     ) public pure returns (bytes32 r, bytes32 s, uint8 v) {
@@ -140,7 +168,6 @@ contract UniversityDiploma is Initializable, OwnableUpgradeable {
         return ecrecover(ethSignedMessageHash, v, r, s);
     }
 
-    // Certificate, диплом шинээр бүртгэх
     function addApprovedCertification(string memory _hash, string memory _imageHash, string memory _metaHash,
         string memory _certNum, uint256 _expireDate, string memory _desc, bytes memory signature) public returns (uint256) {
         address signer = recoverSigner(_metaHash, _certNum, signature);
@@ -182,8 +209,7 @@ contract UniversityDiploma is Initializable, OwnableUpgradeable {
         require(cert.id == 0 || revokeInfo.isRevoked == true, "Already registered certification number");
     }
 
-    function approve(string memory _hash) public {
-        require(msg.sender == approver, "Permission Denied");
+    function approve(string memory _hash) public onlyApprover {
         Certification memory cert = certifications[_hash];
         require(cert.id > 0, "Not Found");
         RevokeInfo memory revokeInfo = revokeInfos[_hash];
@@ -210,6 +236,7 @@ contract UniversityDiploma is Initializable, OwnableUpgradeable {
     function getRevokeInfo(string memory hash) view public returns (RevokeInfo memory) {
         return revokeInfos[hash];
     }
+
     function getApproveInfo(string memory hash) view public returns (ApproveInfo memory) {
         return approveInfos[hash];
     }
@@ -243,11 +270,6 @@ contract UniversityDiploma is Initializable, OwnableUpgradeable {
 
     function getCredit(address addr) view public returns (uint256) {
         return _getCredit(addr);
-    }
-
-    function getIssuer(address issuer) view public returns (SharedStructs.Issuer memory) {
-        IssuerRegistration ir = IssuerRegistration(issuerRegistrationAddress);
-        return ir.getIssuer(issuer);
     }
 
     function addTransactionId(string memory _hash, string memory _txid) public {
