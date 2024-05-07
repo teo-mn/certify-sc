@@ -45,7 +45,7 @@ contract UniversityDiploma is Initializable, OwnableUpgradeable {
     event ApproverAddressChanged(address oldAddr, address newAddr, uint256 timestamp);
     event ApproverAddressAdded(address addr);
     event ApproverAddressRemoved(address addr);
-    event UpdatedQrCodeData(string certNum, string qrDataHash);
+    event UpdatedQrCodeData(string indexed certNum, string qrDataHash);
 
     uint256 public id;
     address public creditAddress;
