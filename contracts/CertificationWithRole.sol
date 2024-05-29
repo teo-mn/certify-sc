@@ -161,13 +161,13 @@ contract CertificationRegistrationWithRole is Initializable, OwnableUpgradeable,
     }
 
     // дипломыг буцаах
-    function revoke(string memory hash, string memory revokerName) public {
+    function revoke(string memory hash, string memory revokerName) public onlyRole(ISSUER_ROLE) {
         Certification memory cert = certifications[hash];
         revokeUtil(cert, revokerName);
     }
 
     // дипломыг буцаах
-    function revokeById(uint256 ID, string memory revokerName) public {
+    function revokeById(uint256 ID, string memory revokerName) public onlyRole(ISSUER_ROLE)  {
         Certification memory cert = mapById[ID];
         revokeUtil(cert, revokerName);
     }
@@ -175,8 +175,6 @@ contract CertificationRegistrationWithRole is Initializable, OwnableUpgradeable,
     function revokeUtil(Certification memory cert, string memory revokerName) internal {
         // check exists
         require(cert.id > 0, "Certification not found");
-        // check issuer
-        require(msg.sender == cert.issuer, "Permission denied");
         require(cert.isRevoked == false, "Certification already revoked");
         // check credit
         require(_getCredit(msg.sender) > 0, "Not enough credit");
